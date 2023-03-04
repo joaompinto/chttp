@@ -13,20 +13,12 @@ class Fetcher:
 
     def get_all(self):
         with concurrent.futures.ThreadPoolExecutor(
-            max_workers=self.max_workers
+            max_workers=self.max_workers,
         ) as executor:
+            results = executor.map(self.fetch_url, self.urls)
             # Start the load operations and mark each future with its URL
-            future_to_url = {
-                executor.submit(self.fetch_url, url): url for url in self.urls
-            }
-            for future in concurrent.futures.as_completed(future_to_url):
-                url = future_to_url[future]
-                try:
-                    result = future.result()
-                except Exception as exc:
-                    print("%r generated an exception: %s" % (url, exc))
-                else:
-                    yield result
+            for result in results:
+                yield result
 
     def fetch_url(self, url):
         return requests.get(url)
