@@ -1,4 +1,5 @@
 import concurrent.futures
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 import requests
@@ -11,7 +12,7 @@ class Fetcher:
     urls: list[str]  # List of urls to be downloaded
     max_workers: int | None = None
 
-    def get_all(self):
+    def get_all(self) -> Iterable[requests.Response]:
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=self.max_workers,
         ) as executor:
@@ -20,5 +21,5 @@ class Fetcher:
             for result in results:
                 yield result
 
-    def fetch_url(self, url):
+    def fetch_url(self, url: str) -> requests.Response:
         return requests.get(url)
